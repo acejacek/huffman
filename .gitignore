@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+tags
+compressor
+*.huf
+*.txt
+!input.txt
+

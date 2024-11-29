@@ -1,2 +1,4 @@
-# huffman
-File compressor/decompressor with Huffman coding
+# Huffman Compressor
+
+File compressor/decompressor with Huffman coding.
+
