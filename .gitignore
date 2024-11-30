@@ -56,4 +56,4 @@ compressor
 *.huf
 *.txt
 !input.txt
-
+*.swp

@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include "huff.h"
 
 /*! Create node
@@ -109,7 +106,7 @@ static void  initialize_nodes(Huff* h)
     unsigned char byte;
     while (fread(&byte, sizeof(byte), 1, h->input_file) != 0)
     {
-        h->message_size++;
+        h->message_size++; // [FIXME] this is uint32_t? Anything to worry?
         Node* n = find_node(h, byte);
         if (!n)
         {   
@@ -225,7 +222,7 @@ static void write_header(Huff* h)
 {
     Header header = {
         .identifier = "HUFx",
-        .message_size = h->message_size,
+        .message_size = htonl(h->message_size),
     };
 
     header.identifier[3] = h->mode;
@@ -355,7 +352,7 @@ static void read_header(Huff* h)
     }
 
     h->mode = header.identifier[3];  // mode 1, 2 ...
-    h->message_size = header.message_size;
+    h->message_size = ntohl(header.message_size);
 }
 
 /*! Print graph

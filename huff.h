@@ -1,6 +1,12 @@
 #ifndef HUFF_H
 #define HUFF_H
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+
 #define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
   ((byte) & 0x80 ? '1' : '0'), \
@@ -42,7 +48,7 @@ typedef struct {
     Node* head;
     Node* first;
     size_t nodes_count;
-    size_t message_size;
+    uint32_t message_size;
     FILE* input_file;
     FILE* output_file;
     char error;
@@ -55,7 +61,7 @@ typedef struct {
 
 typedef struct {
     char identifier[4];
-    size_t message_size;
+    uint32_t message_size;
 } Header;
 
 typedef struct {
