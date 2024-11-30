@@ -54,6 +54,7 @@ typedef struct {
     char error;
     char error_msg[100];
     int quiet;
+    int export_tree;
     unsigned char io_buffer;
     int buff_pos;
     unsigned char mode;

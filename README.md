@@ -8,7 +8,7 @@ File compressor/decompressor with Huffman coding.
 
 ### Planed features
 - ~~Make archive endian-independent. Now header is created in a way that archives created at x86 won't be read correctly on ARM, and vice versa.~~ [DONE]
-- Export Huffman tree in Graphviz format.
+- ~~Export Huffman tree in Graphviz format.~~ [DONE]
 - Add additional levels of compression.
 - Check code on other architectures.
 - Add more verbose compression output (progress bar, ratio, etc.).

@@ -57,3 +57,4 @@ compressor
 *.txt
 !input.txt
 *.swp
+*.gv

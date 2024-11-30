@@ -16,6 +16,7 @@ void help(char* program)
     fprintf(stderr, "       -1 standard compression (default)\n");
     fprintf(stderr, "       -2 higher compression ratio, slower\n");
     fprintf(stderr, "       -q quiet\n");
+    fprintf(stderr, "       -p print Huffman tree in Graphviz format\n");
 }
 
 int main(int argc, char** argv)
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
     int option;
     char* in_filename = NULL;
     huff = NULL;
-    while ((option = getopt(argc, argv, "c:x:qh12")) != -1)
+    while ((option = getopt(argc, argv, "c:x:qh12p")) != -1)
     {
         switch (option)
         {
@@ -72,6 +73,10 @@ int main(int argc, char** argv)
 
             case 'q':
                 h->quiet = 1;
+                break;
+
+            case 'p':
+                h->export_tree = 1;
                 break;
 
             default:

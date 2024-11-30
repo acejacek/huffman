@@ -380,8 +380,10 @@ void print_tree(Huff* h, Node* n)
         print_tree(h, n->right);
     }
     else         // it's leaf
-//        printf("Node_%zu\nNode_%zu [label=\"%d %c\" shape=box]\n", n->id, n->id, n->value, n->value);
-        printf("Node_%zu\nNode_%zu [label=\"%d\" shape=box]\n", n->id, n->id, n->value);
+        if (n->value > 32 && n->value < 127) // printable
+            printf("Node_%zu\nNode_%zu [label=\"%c $%02X\" shape=box]\n", n->id, n->id, n->value, n->value);
+        else
+            printf("Node_%zu\nNode_%zu [label=\"%02X\" shape=box]\n", n->id, n->id, n->value);
 
     if (n == h->head)
     {
@@ -410,6 +412,7 @@ Huff* init(void)
     h->nodes_count = 0;
     h->error = 0;
     h->quiet = 0;
+    h->export_tree = 0;
     h->buff_pos = 0;
     h->mode = '1';
 
@@ -440,7 +443,7 @@ void cleanup(Huff* h)
  */
 void open_input(Huff* h, const char* filename)
 {
-    if (!h->quiet)
+    if (!h->quiet && !h->export_tree)
         printf("Input: %s\n", filename);
 
     h->input_file = fopen(filename, "rb");
@@ -454,7 +457,7 @@ void open_input(Huff* h, const char* filename)
  */
 void open_output(Huff* h, const char* filename)
 {
-    if (!h->quiet)
+    if (!h->quiet && !h->export_tree)
         printf("Output: %s\n", filename);
 
     h->output_file = fopen(filename, "wb");
@@ -469,12 +472,13 @@ void open_output(Huff* h, const char* filename)
  */
 void compress(Huff* h)
 {
-    if (!h->quiet)
+    if (!h->quiet && !h->export_tree)
         printf("Compress...\n");
 
     initialize_nodes(h);
     EXIT_ON_ERROR;
-    print_tree(h, h->head);
+    if (h->export_tree)
+        print_tree(h, h->head);
     write_header(h);
     EXIT_ON_ERROR;
     if (h->mode == '2')

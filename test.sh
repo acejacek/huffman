@@ -51,6 +51,14 @@ mv input.txt.huf temp.txt.huf
 ratio
 check
 
+# Mode 2 = compressed header, export tree to stdout and tree.gv file
+./compressor -q -c input.txt -2 -p | tee tree.gv
+mv input.txt.huf temp.txt.huf
+./compressor -x temp.txt.huf -q
+
+ratio
+check
+
 # help
 ./compressor -h
 
