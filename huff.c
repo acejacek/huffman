@@ -386,10 +386,10 @@ void print_tree(Huff* h, Node* n)
         print_tree(h, n->right);
     }
     else         // it's leaf
-        if (n->value > 32 && n->value < 127) // printable
-            printf("Node_%zu\nNode_%zu [label=\"%c $%02X\" shape=box]\n", n->id, n->id, n->value, n->value);
+        if (n->value > 32 && n->value < 127 && n->value != '"') // printable
+            printf("Node_%zu\nNode_%zu [label=\"%c $%02X\\n%zu\" shape=box]\n", n->id, n->id, n->value, n->value, n->weight);
         else
-            printf("Node_%zu\nNode_%zu [label=\"%02X\" shape=box]\n", n->id, n->id, n->value);
+            printf("Node_%zu\nNode_%zu [label=\"%02X\\n%zu\" shape=box]\n", n->id, n->id, n->value, n->weight);
 
     if (n == h->head)
     {
