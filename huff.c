@@ -39,6 +39,7 @@ static Node* new_node(Huff* h, Node* left, Node* right)
  */
 static void merge_nodes(Huff* h)
 {
+    // find node with lowest weight
     Node* min_a = NULL;
     for (Node* n = h->first; n != NULL; n = n->next)
     {
@@ -54,6 +55,9 @@ static void merge_nodes(Huff* h)
             min_a = n;
     }
 
+    if (!min_a) return;  // no nore unattached nodes found
+
+    // find second node with lowest weight
     Node* min_b = NULL;
     for (Node* n = h->first; n != NULL; n = n->next)
     {
@@ -77,6 +81,7 @@ static void merge_nodes(Huff* h)
         return;
     }
 
+    if (min_a->weight == 133 || min_b->weight == 133) printf("hi there\n");
     new_node(h, min_a, min_b);
     EXIT_ON_ERROR;
 
@@ -88,7 +93,7 @@ static void merge_nodes(Huff* h)
  * Search all nodes until match with value.
  * Node needs to be leaf (no childen).
  */
-static Node* find_node(const Huff* h, char a)
+static Node* find_node(const Huff* h, uint8_t a)
 {
     for (Node* n = h->first; n != NULL; n = n->next)
         if (n->value == a && n->left == NULL) return n;
@@ -103,7 +108,7 @@ static Node* find_node(const Huff* h, char a)
  */
 static void  initialize_nodes(Huff* h)
 {
-    unsigned char byte;
+    uint8_t byte;
     while (fread(&byte, sizeof(byte), 1, h->input_file) != 0)
     {
         h->message_size++; // [FIXME] this is uint32_t? Anything to worry?
@@ -113,6 +118,7 @@ static void  initialize_nodes(Huff* h)
             // it's byte without node yet, create new
             n = new_node(h, NULL, NULL);
             if (!n) return;  // exit with problem on node allocation
+
             n->value = byte;
         }
         else
@@ -167,7 +173,7 @@ static void write_io_buffer(Huff* h)
  *
  * works in MSB. If buffer is full, it flushes it to disk.
  */
-static void write_bit(Huff* h, unsigned char b)
+static void write_bit(Huff* h, uint8_t b)
 {
     if (h->buff_pos > 7)
     {
@@ -187,7 +193,7 @@ static void write_bit(Huff* h, unsigned char b)
  *
  * starts from MSB
  */
-static void write_byte(Huff* h, unsigned char v)
+static void write_byte(Huff* h, uint8_t v)
 {
     for (int i = 7; i >= 0; --i)
         write_bit(h, TEST_BIT(v, i));
@@ -291,9 +297,9 @@ int read_bit(Huff* h)
  *
  * reads bit by bit, from MSB
  */
-unsigned char read_byte(Huff* h)
+uint8_t read_byte(Huff* h)
 {
-    unsigned char b = 0;
+    uint8_t b = 0;
     for (int i = 7; i >= 0; --i)
         if (read_bit(h))
             SET_BIT(b, i);
@@ -490,14 +496,19 @@ void compress(Huff* h)
     else
         serialize(h, h->head);
     EXIT_ON_ERROR;
-
     int bit = 7;
-    unsigned char enc = 0;
-    unsigned char byte;
+    uint8_t enc = 0;
+    uint8_t byte;
     rewind(h->input_file);
     while (fread(&byte, sizeof(byte), 1, h->input_file) != 0)
     {
         Node* n = find_node(h, byte);
+        if (!n)
+        {
+            SET_ERROR("Can't find node in Huffman tree with byte %d", byte);
+            EXIT_ON_ERROR;
+        }
+
         size_t frame = 0;  // reset temporary coding frame for single byte
         size_t frame_bit = 0;
         while (n->up != NULL)
@@ -532,7 +543,7 @@ void compress(Huff* h)
         fputc(enc, h->output_file);
 }
 
-/*! Deompress function
+/*! Decompress function
  *
  * Decompresses input file to output file using tree of nodes
  * Reads header, builds tree and then write uncompressed data to output file
@@ -556,7 +567,7 @@ void decompress(Huff* h)
     long encoded_size = ftell(h->input_file) - current_pos;
     fseek(h->input_file, current_pos, SEEK_SET);
 
-    char *decode = malloc(encoded_size);
+    char *decode = malloc(encoded_size * sizeof(*decode));
     fread(decode, sizeof(*decode), encoded_size, h->input_file);
 
     long pos = 0;
@@ -586,5 +597,6 @@ void decompress(Huff* h)
         }
         fputc(n->value, h->output_file);  // decoded value from tree leaf
     }
+    free(decode);
 }
 

@@ -23,10 +23,10 @@
 #define CLEAR_BIT(value,bit)      ((value) &= ~BIT_MASK(bit))
 #define TEST_BIT(value,bit)       (((value) & BIT_MASK(bit)) ? 1 : 0)
 
-#define SET_ERROR(mes) do { strcpy(h->error_msg, (mes)); \
-                         h->error = 1; } while (0)
-#define EXIT_ON_ERROR { if (h->error) {return;} } 
-#define EXIT_ON_ERROR { if (h->error) {return;} } 
+#define SET_ERROR(...) do { snprintf(h->error_msg, sizeof(h->error_msg), __VA_ARGS__); \
+                            h->error = 1; } while (0)
+#define EXIT_ON_ERROR do { if (h->error) {return;} } while (0)
+#define EXIT_ON_ERROR do { if (h->error) {return;} } while (0)
 #define GOTO_ERROR do { if (h->error) { \
                        exit_status = EXIT_FAILURE; \
                        goto Error; } } while (0)
@@ -36,7 +36,7 @@
 
 typedef struct node {
     size_t id;
-    unsigned char value;
+    uint8_t value;
     size_t weight;
     struct node* left;
     struct node* right;
@@ -55,9 +55,9 @@ typedef struct {
     char error_msg[100];
     int quiet;
     int export_tree;
-    unsigned char io_buffer;
+    uint8_t io_buffer;
     int buff_pos;
-    unsigned char mode;
+    uint8_t mode;
 } Huff;
 
 typedef struct {
@@ -67,7 +67,7 @@ typedef struct {
 
 typedef struct {
     char child_status;
-    const unsigned char value;
+    const uint8_t value;
 } Element;
 
 Huff* init(void);
